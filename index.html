@@ -1,0 +1,352 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">        
+        
+        <style>
+            .error
+            {
+                border: 1px red solid;
+            }
+            
+            .box
+            {
+              height: 200px;  
+              background-color: black;
+              border: white 2px solid;
+            }
+            
+            .prize
+            {
+                background-color: green !important;
+            }
+
+            .flipped
+            {
+                background-color: red !important;
+            }
+            
+            .selected
+            {
+                color: blue;
+            }
+            
+            #loginBtn, #logoutBtn, #registerBtn
+            {
+                display: none;
+            }
+            
+            a, a:hover
+            {
+                color: white;    
+            }
+        </style>
+    </head>
+    
+    <body>
+        <div class="jumbotron jumbotron-fluid mb-0">
+            <div class="container">
+                <h1 class="display-4">Treasure Hunt</h1>
+                <p class="lead">Find the treasure fast!</p>
+            </div>
+        </div>        
+        <div class="">
+            <ul class="nav justify-content-start border p-2 bg-dark text-light">
+                <li class="nav-item">
+                    <a href="#" id='loginBtn' class='nav-link'>Login</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" id='registerBtn' class='nav-link'>Register</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" id='logoutBtn' class='nav-link'>Logout</a>
+                </li>
+                <li class="nav-item">
+                    <span id="msg"></span>
+                </li>
+            </ul>            
+        </div>
+        
+        <div class="container">
+            
+            <h4>Treasure Hunt</h4>
+
+            <!--boxes-->
+            <div id='boxes' class='row'>
+            </div>
+            
+            <p>Guesses: <span id='guesses'>0</span></p>
+        </div>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>        
+        
+        <!--put your modal dialogs here...-->
+        <!--Login modal...-->
+        <div id='loginDlg' class="modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-dark text-light">
+                        <h5 class="modal-title">Login</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <h4>Login</h4>
+                        <form class="border border-primary p-3">
+                            <div class="form-group">
+                                <input type="text" class="form-control" id="email" name="email" placeholder="Email">
+                            </div>
+                            <div class="form-group">
+                                <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+                            </div>
+                        </form> 
+                    </div>
+                    <div class="modal-footer">
+                        <button id='confirmLoginBtn' type="button" class="btn btn-primary">Login</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>    
+        <!--Register modal...-->
+        <div id='registerDlg' class="modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-dark text-light">
+                        <h5 class="modal-title">Register</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <h4>Register</h4>
+                        <form class="border border-primary p-3">
+                            <div class="form-group">
+                                <input type="text" class="form-control" id="regEmail" name="regEmail" placeholder="Email">
+                            </div>
+                            <div class="form-group">
+                                <input type="password" class="form-control" id="regPassword" name="regPassword" placeholder="Password">
+                            </div>
+                        </form> 
+                    </div>
+                    <div class="modal-footer">
+                        <button id='confirmRegisterBtn' type="button" class="btn btn-primary">Register</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div> 
+        <!--Game dialogue-->
+        <div id='confirm' class="modal" tabindex="-1" role="dialog">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header bg-dark text-light">
+                <h5 class="modal-title">Play Again?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <p>Would you like to play again?</p>
+              </div>
+              <div class="modal-footer">
+                <button id='yes' type="button" class="btn btn-primary">Yes</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+              </div>
+            </div>
+          </div>
+        </div>                
+        
+             
+        
+        <script>
+        /* global $ */
+        $(document).ready(function() 
+        {
+            // model ....
+            let model = {};
+            let gamemodel = {};
+
+            function initializeModel()
+            {
+                sendRequest("whoIsLoggedIn", function()
+                {
+                    if (model.error == undefined)
+                        sendRequest("game");    
+                });
+                
+                let boxCount = 6;
+                gamemodel.guesses = 0;
+                gamemodel.score = 0;
+                gamemodel.boxes = [];
+                let prize = Math.floor(Math.random() * boxCount);
+                for (var i = 0; i < boxCount; i++) 
+                {
+                  gamemodel.boxes.push({flipped: false, prize: false});
+                }
+                gamemodel.boxes[prize].prize = true;
+                gamemodel.gameOver = false;
+            }
+            
+            // view...
+            function updateView()
+            {
+                console.log(model);
+                //boxes...
+                $('#boxes').empty();                
+                for (var i in gamemodel.boxes) 
+                {
+                    let item = $("<div class='col-6 box'></div>");
+                    if (gamemodel.boxes[i].flipped && gamemodel.boxes[i].prize)
+                    {
+                      item.addClass("prize");
+                    }
+                    else if (gamemodel.boxes[i].flipped && !gamemodel.boxes[i].prize)
+                    {
+                      item.addClass("flipped");
+                    }
+                    item.attr("id", i);
+                    $('#boxes').append(item);
+                }
+                $("#guesses").text(gamemodel.guesses);
+                
+                
+                
+                if (model.result == undefined)
+                {
+                    $("#msg").text(model.error);
+                    
+                    $("#logoutBtn").hide();
+                    $("#loginBtn").show();
+                    $("#registerBtn").show();
+            
+                }
+                else
+                {
+                    $("#logoutBtn").show();
+                    $("#loginBtn").hide();
+                    $("#registerBtn").hide();
+                    
+                    if (model.result.email == undefined)
+                    {
+                     
+                        for (let i in model.result)
+                        {
+                            let item = $("<li class='list-group-item'></li>");
+                            item.text(model.result[i].SONG_NAME);
+                            
+                            let btn = $("<button class='deleteBtn btn btn-danger float-right'>Delete</button>");
+                            
+                            item.append(btn);
+                            
+                           
+                        }
+                    }
+                    else
+                    {
+                        $("#msg").text("Hello " + model.result.email);
+                    }
+                }
+            }            
+            
+            // controller ...
+            function sendRequest(url, callback)
+            {
+                var jqxhr = $.get(url);
+                jqxhr.done(function(json) 
+                {
+                    model = json;
+                    updateView();
+                    if (callback !== undefined)
+                        callback();
+                });
+                jqxhr.fail(function(json) 
+                {
+                    let error = JSON.stringify(json);
+                    model.error = error;
+                    updateView();
+                });
+            }
+            
+            $(document).on("click",".box",function() 
+            {
+                if (gamemodel.gameOver == true)
+                {
+                  return;
+                }
+                
+                let i = $(this).attr("id");
+                if (!gamemodel.boxes[i].flipped)
+                {
+                  gamemodel.guesses = gamemodel.guesses+1;
+                  gamemodel.boxes[i].flipped = true;
+                  if(gamemodel.boxes[i].prize)
+                  {
+                    gamemodel.gameOver = true;
+                    updateView();
+                    $('#confirm').modal('show');
+                  }
+                  else
+                  {
+                    updateView();
+                  }
+                }
+            });
+
+            $('#yes').click(function() 
+            {
+                $('#confirm').modal('hide');
+                initializeModel();
+                updateView();
+            });
+
+            $('#loginBtn').click(function() 
+            {
+                $('#password').val('');
+                $('#loginDlg').modal('show');
+            });
+
+            $('#registerBtn').click(function() 
+            {
+                $('#regEmail').val('');
+                $('#regPassword').val('');
+                $('#registerDlg').modal('show');
+            });
+            
+            
+            $('#confirmLoginBtn').click(function() 
+            {
+                let email = $('#email').val().trim();
+                let password = $('#password').val().trim();
+                
+                sendRequest("login?email="+email+"&password="+password, function ()
+                {
+                    if (model.error == undefined)
+                        sendRequest("listSongs");    
+                });
+                $('#loginDlg').modal('hide');
+            });
+
+            $('#confirmRegisterBtn').click(function() 
+            {
+                let email = $('#regEmail').val().trim();
+                let password = $('#regPassword').val().trim();
+                sendRequest("register?email="+email+"&password="+password, function () 
+                { 
+                    if (model.error == undefined)
+                        sendRequest("listSongs");
+                });
+                
+                $('#registerDlg').modal('hide');
+            });
+            
+            // run...
+            initializeModel();
+            updateView();
+        });
+        
+        </script>
+    </body>
+</html>
